@@ -6,6 +6,7 @@ Facebook for login and share demo
 官方教程：
 
 登录： - https://developers.facebook.com/docs/facebook-login
+
 分享： - https://developers.facebook.com/docs/sharing
 
 其他更详细参见：https://github.com/facebook/facebook-ios-sdk
@@ -26,6 +27,7 @@ Facebook for login and share demo
 //如果发现弹出的登录无法关闭，请将添加下面这个，注释上面的代码
 
 //解决方案来源：http://stackoverflow.com/questions/32299271/facebook-sdk-login-never-calls-back-my-application-on-ios-9
+
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<NSString*, id> *)options {
     return [[FBSDKApplicationDelegate sharedInstance] application:app
                                                           openURL:url
