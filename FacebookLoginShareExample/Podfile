@@ -1,0 +1,8 @@
+platform:ios, '7.0'
+
+#Facebook SDK
+pod 'FBSDKCoreKit'
+pod 'FBSDKLoginKit'
+pod 'FBSDKShareKit'
+
+pod 'SDWebImage'
