@@ -28,6 +28,7 @@
 #if !TARGET_OS_TV
 #import <FBSDKShareKit/FBSDKAppInviteContent.h>
 #import <FBSDKShareKit/FBSDKGameRequestContent.h>
+#import <FBSDKShareKit/FBSDKShareCameraEffectContent.h>
 #endif
 
 @interface FBSDKShareUtility : NSObject
@@ -42,9 +43,14 @@
                   methodName:(NSString *__autoreleasing *)methodNameRef
                   parameters:(NSDictionary *__autoreleasing *)parametersRef
                        error:(NSError *__autoreleasing *)errorRef;
++ (void)buildAsyncWebPhotoContent:(FBSDKSharePhotoContent *)content
+                completionHandler:(void(^)(BOOL, NSString *, NSDictionary *))completion;
 + (NSDictionary *)convertOpenGraphValues:(NSDictionary *)dictionary;
 + (NSDictionary *)feedShareDictionaryForContent:(id<FBSDKSharingContent>)content;
 + (NSString *)hashtagStringFromHashtag:(FBSDKHashtag *)hashtag;
++ (UIImage *)imageWithCircleColor:(UIColor *)color
+                       canvasSize:(CGSize)canvasSize
+                       circleSize:(CGSize)circleSize;
 + (NSDictionary *)parametersForShareContent:(id<FBSDKSharingContent>)shareContent
                       shouldFailOnDataError:(BOOL)shouldFailOnDataError;
 + (void)testShareContent:(id<FBSDKSharingContent>)shareContent
@@ -64,6 +70,8 @@
 
 #if !TARGET_OS_TV
 + (BOOL)validateAppInviteContent:(FBSDKAppInviteContent *)appInviteContent error:(NSError *__autoreleasing *)errorRef;
++ (BOOL)validateShareCameraEffectContent:(FBSDKShareCameraEffectContent *)ShareCameraEffectContent
+                                   error:(NSError *__autoreleasing *)errorRef;
 + (BOOL)validateGameRequestContent:(FBSDKGameRequestContent *)gameRequestContent error:(NSError *__autoreleasing *)errorRef;
 #endif
 @end

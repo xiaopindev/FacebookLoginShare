@@ -90,18 +90,60 @@
 }
 
 - (IBAction)shareContent:(id)sender {
-    NSString *shareText = @"it is test text";
-    NSString *shareImageUrl = @"http://112.74.31.9/edback/videoImg/1452246037334part-1.jpg";
-    NSString *shareVideoUrl = @"https://www.youtube.com/watch?v=SWZQk7H6my4";
-    NSString *contentDescription = @"contentDescription1111";
+    NSString *shareTitle = @"This is a Title";
+    NSString *shareText = @"This is a text";
+    NSString *shareImageUrl = @"https://api.cdeclips.com/vdocms/videoImg/15330259017007413.jpg";
+    NSString *shareLinkUrl = @"https://www.vdoenglish.com/video/videoView_videoView?video.id=1116";
     
+    //4.35.0
+    /*
+     分享链接：contentURL
+     应用说明：quote （可以放置标题）
+     */
+    
+#if 0
     FBSDKShareLinkContent *content = [[FBSDKShareLinkContent alloc] init];
-    content.contentURL = [NSURL URLWithString:shareVideoUrl];
-    content.contentTitle = shareText;
-    content.contentDescription = contentDescription;
-    content.imageURL = [NSURL URLWithString:shareImageUrl];
-    [FBSDKShareDialog showFromViewController:self withContent:content delegate:self];
+    content.contentURL = [NSURL URLWithString:shareLinkUrl];
+    //引用说明
+    content.quote = [NSString stringWithFormat:@"%@. Click the hyperlink below for details>>",shareTitle];
+    //话题标签
+    content.hashtag = [FBSDKHashtag hashtagWithString:@"#VDOEnglish"];
+    //Facebook 应用
+    [FBSDKShareDialog showFromViewController:self
+                                 withContent:content
+                                    delegate:self];
+#else
+    //messenger 应用
+    //判断messenger 是否安装的方式
+    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"fb-messenger-share-api://"]]) {
+        //-canOpenURL: failed for URL: "fb-messenger-share-api:/" - error: "The operation couldn’t be completed. (OSStatus error -10814.)"
+        
+        FBSDKShareMessengerURLActionButton *detailButton = [[FBSDKShareMessengerURLActionButton alloc] init];
+        detailButton.title = @"View Details";
+        detailButton.url = [NSURL URLWithString:shareLinkUrl];
+        
+        FBSDKShareMessengerGenericTemplateElement *element = [[FBSDKShareMessengerGenericTemplateElement alloc] init];
+        element.title = shareTitle;
+        element.subtitle = shareText;
+        element.imageURL = [NSURL URLWithString:shareImageUrl];
+        element.button = detailButton;
+        
+        FBSDKShareMessengerGenericTemplateContent *content = [[FBSDKShareMessengerGenericTemplateContent alloc] init];
+        content.pageID = shareLinkUrl;
+        content.element = element;
+
+        FBSDKMessageDialog *messageDialog = [[FBSDKMessageDialog alloc] init];
+        messageDialog.shareContent = content;
+        messageDialog.delegate = self;
+
+        if ([messageDialog canShow]) {
+            [messageDialog show];
+        }
+    }else{
+        NSLog(@"没有安装messenger");
+    }
     
+#endif
 }
 
 -(void)sharer:(id<FBSDKSharing>)sharer didCompleteWithResults:(NSDictionary *)results{

@@ -21,6 +21,8 @@
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
 #if !TARGET_OS_TV
+#import "AppEvents/Codeless/FBSDKViewHierarchy.h"
+#import "AppEvents/Codeless/FBSDKCodelessMacros.h"
 #import "BridgeAPI/FBSDKBridgeAPIProtocol.h"
 #import "BridgeAPI/FBSDKBridgeAPIProtocolType.h"
 #import "BridgeAPI/FBSDKBridgeAPIRequest.h"
@@ -41,6 +43,7 @@
 #else
 #import "Device/FBSDKDeviceButton+Internal.h"
 #import "Device/FBSDKDeviceDialogView.h"
+#import "Device/FBSDKSmartDeviceDialogView.h"
 #import "Device/FBSDKDeviceViewControllerBase+Internal.h"
 #import "Device/FBSDKModalFormPresentationController.h"
 #endif
@@ -54,10 +57,14 @@
 #import "ErrorRecovery/FBSDKErrorRecoveryAttempter.h"
 #import "FBSDKDynamicFrameworkLoader.h"
 #import "FBSDKApplicationDelegate+Internal.h"
+#import "FBSDKDeviceRequestsHelper.h"
 #import "FBSDKError.h"
+#import "FBSDKImageDownloader.h"
 #import "FBSDKInternalUtility.h"
 #import "FBSDKLogger.h"
 #import "FBSDKMath.h"
+#import "FBSDKSettings+Internal.h"
+#import "FBSDKSwizzler.h"
 #import "FBSDKTypeUtility.h"
 #import "Network/FBSDKGraphRequest+Internal.h"
 #import "Network/FBSDKGraphRequestConnection+Internal.h"

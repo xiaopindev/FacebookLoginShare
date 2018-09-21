@@ -30,7 +30,7 @@ static int const FBSDKTokenRefreshRetrySeconds = 60 * 60;           // hour
   if ([FBSDKSettings appID].length > 0) {
     BOOL safeForPiggyback = YES;
     for (FBSDKGraphRequestMetadata *metadata in connection.requests) {
-      if (![metadata.request.version isEqualToString:FBSDK_TARGET_PLATFORM_VERSION] ||
+      if (![metadata.request.version isEqualToString:[FBSDKSettings graphAPIVersion]] ||
           [metadata.request hasAttachments]) {
         safeForPiggyback = NO;
         break;
@@ -126,7 +126,9 @@ static int const FBSDKTokenRefreshRetrySeconds = 60 * 60;           // hour
 
 + (void)addServerConfigurationPiggyback:(FBSDKGraphRequestConnection *)connection
 {
-  if (![[FBSDKServerConfigurationManager cachedServerConfiguration] isDefaults]) {
+  if (![[FBSDKServerConfigurationManager cachedServerConfiguration] isDefaults]
+      && [[NSDate date] timeIntervalSinceDate:[FBSDKServerConfigurationManager cachedServerConfiguration].timestamp]
+      < FBSDK_SERVER_CONFIGURATION_MANAGER_CACHE_TIMEOUT) {
     return;
   }
   NSString *appID = [FBSDKSettings appID];

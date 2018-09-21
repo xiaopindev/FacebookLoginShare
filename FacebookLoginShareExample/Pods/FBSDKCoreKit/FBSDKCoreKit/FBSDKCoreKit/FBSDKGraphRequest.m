@@ -30,6 +30,7 @@
 
 // constants
 static NSString *const kGetHTTPMethod = @"GET";
+static NSString *const kPostHTTPMethod = @"POST";
 
 @interface FBSDKGraphRequest()
 @property (nonatomic, assign) FBSDKGraphRequestFlags flags;
@@ -77,7 +78,7 @@ static NSString *const kGetHTTPMethod = @"GET";
   if ((self = [self initWithGraphPath:graphPath
                            parameters:parameters
                           tokenString:tokenString
-                              version:FBSDK_TARGET_PLATFORM_VERSION
+                              version:[FBSDKSettings graphAPIVersion]
                            HTTPMethod:HTTPMethod])) {
     self.flags |= flags;
   }
@@ -91,7 +92,7 @@ static NSString *const kGetHTTPMethod = @"GET";
                        HTTPMethod:(NSString *)HTTPMethod {
   if ((self = [super init])) {
     _tokenString = [tokenString copy];
-    _version = version ? [version copy] : FBSDK_TARGET_PLATFORM_VERSION;
+    _version = version ? [version copy] : [FBSDKSettings graphAPIVersion];
     _graphPath = [graphPath copy];
     _HTTPMethod = HTTPMethod ? [HTTPMethod copy] : kGetHTTPMethod;
     _parameters = [[NSMutableDictionary alloc] initWithDictionary:parameters];
@@ -144,12 +145,23 @@ static NSString *const kGetHTTPMethod = @"GET";
 + (NSString *)serializeURL:(NSString *)baseUrl
                     params:(NSDictionary *)params
                 httpMethod:(NSString *)httpMethod {
+  return [self serializeURL:baseUrl params:params httpMethod:httpMethod forBatch:NO];
+}
+
++ (NSString *)serializeURL:(NSString *)baseUrl
+                    params:(NSDictionary *)params
+                httpMethod:(NSString *)httpMethod
+                  forBatch:(BOOL)forBatch {
   params = [self preprocessParams: params];
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   NSURL *parsedURL = [NSURL URLWithString:[baseUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
 #pragma clang pop
+  if ([httpMethod isEqualToString:kPostHTTPMethod] && !forBatch) {
+    return baseUrl;
+  }
+
   NSString *queryPrefix = parsedURL.query ? @"&" : @"?";
 
   NSString *query = [FBSDKInternalUtility queryStringWithDictionary:params error:NULL invalidObjectHandler:^id(id object, BOOL *stop) {

@@ -1,8 +1,13 @@
-platform:ios, '7.0'
+platform:ios, '9.0'
+
+target 'FacebookLoginShareExample' do
 
 #Facebook SDK
 pod 'FBSDKCoreKit'
 pod 'FBSDKLoginKit'
 pod 'FBSDKShareKit'
+pod 'FBSDKMessengerShareKit'
 
 pod 'SDWebImage'
+
+end

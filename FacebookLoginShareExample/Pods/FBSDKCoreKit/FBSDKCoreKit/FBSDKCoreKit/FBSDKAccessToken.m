@@ -27,6 +27,7 @@ NSString *const FBSDKAccessTokenDidChangeNotification = @"com.facebook.sdk.FBSDK
 NSString *const FBSDKAccessTokenDidChangeUserID = @"FBSDKAccessTokenDidChangeUserID";
 NSString *const FBSDKAccessTokenChangeNewKey = @"FBSDKAccessToken";
 NSString *const FBSDKAccessTokenChangeOldKey = @"FBSDKAccessTokenOld";
+NSString *const FBSDKAccessTokenDidExpire = @"FBSDKAccessTokenDidExpire";
 
 static FBSDKAccessToken *g_currentAccessToken;
 
@@ -70,6 +71,11 @@ static FBSDKAccessToken *g_currentAccessToken;
   return [self.permissions containsObject:permission];
 }
 
+- (BOOL)isExpired
+{
+  return [self.expirationDate compare:NSDate.date] == NSOrderedAscending;
+}
+
 + (FBSDKAccessToken *)currentAccessToken
 {
   return g_currentAccessToken;
@@ -81,14 +87,15 @@ static FBSDKAccessToken *g_currentAccessToken;
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
     [FBSDKInternalUtility dictionary:userInfo setObject:token forKey:FBSDKAccessTokenChangeNewKey];
     [FBSDKInternalUtility dictionary:userInfo setObject:g_currentAccessToken forKey:FBSDKAccessTokenChangeOldKey];
-    if (![g_currentAccessToken.userID isEqualToString:token.userID]) {
+    // We set this flag also when the current Access Token was not valid, since there might be legacy code relying on it
+    if (![g_currentAccessToken.userID isEqualToString:token.userID] || ![self currentAccessTokenIsActive]) {
       userInfo[FBSDKAccessTokenDidChangeUserID] = @YES;
     }
 
     g_currentAccessToken = token;
 
     // Only need to keep current session in web view for the case when token is current
-    // When token is abandoned cookies must to be cleaned up immediatelly
+    // When token is abandoned cookies must to be cleaned up immediately
     if (token == nil) {
       [FBSDKInternalUtility deleteFacebookCookies];
     }
@@ -98,6 +105,12 @@ static FBSDKAccessToken *g_currentAccessToken;
                                                         object:[self class]
                                                       userInfo:userInfo];
   }
+}
+
++ (BOOL)currentAccessTokenIsActive
+{
+  FBSDKAccessToken *currentAccessToken = [self currentAccessToken];
+  return currentAccessToken != nil && !currentAccessToken.isExpired;
 }
 
 + (void)refreshCurrentAccessToken:(FBSDKGraphRequestHandler)completionHandler
